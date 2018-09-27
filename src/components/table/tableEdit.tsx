@@ -5,13 +5,14 @@
  * @modify date 2018-09-12 18:53:26
  * @desc [description]
 */
-import { Alert, Button, Divider, Drawer, Form, Icon, Modal, Popconfirm, Row, Select, Spin, Tabs, Upload } from 'antd';
+import { Alert, Button, Divider, Drawer, Form, Icon, Modal, Popconfirm, Row, Select, Spin, Tabs, Upload, List, Checkbox } from 'antd';
 import { FormComponentProps, WrappedFormUtils } from 'antd/lib/form/Form';
 import Store from 'core/StoreBasice';
 import lodash from 'lodash';
 import { observer } from 'mobx-react';
 import moment from 'moment';
 import * as React from 'react';
+import DataEntry from './dataEntry';
 const FormItem = Form.Item;
 const Option = Select.Option;
 const TabPane = Tabs.TabPane;
@@ -26,13 +27,9 @@ export default class TableEditComponent extends React.Component<{ Store: Store }
   renderItem({ form, initialValue }: renderItemParams) {
 
   }
-  private async onDelete() {
-    const params = this.Store.dataSource.list.filter(x => this.Store.selectedRowKeys.some(y => y == x.key));
-    let data = await this.Store.onDelete(params)
-    if (data) {
-      this.Store.onGet();
-    }
-  }
+  /**
+   * 渲染按钮组
+   */
   renderButtons(): JSX.Element | JSX.Element[] {
     const button = [];
     const { pageButtons, selectedRowKeys } = this.Store;
@@ -41,7 +38,7 @@ export default class TableEditComponent extends React.Component<{ Store: Store }
       button.push(<Button icon="folder-add" onClick={this.Store.onModalShow.bind(this.Store, {})}>添加</Button>)
     }
     if (pageButtons.import) {
-      button.push(<Button icon="cloud-download" onClick={() => { this.Store.onVisible(true, "port") }}>  导入 / 导出 </Button>)
+      button.push(<Button icon="cloud-download" onClick={() => { this.Store.onPageState("visiblePort", true) }}>  导入 / 导出 </Button>)
     }
     if (pageButtons.delete) {
       button.push(
@@ -59,9 +56,14 @@ export default class TableEditComponent extends React.Component<{ Store: Store }
       </React.Fragment>
     })
   }
+  /**
+   * 多选删除事件
+   */
+  private async onDelete() {
+    const params = this.Store.dataSource.list.filter(x => this.Store.selectedRowKeys.some(y => y == x.key));
+    await this.Store.onDelete(params)
+  }
   render() {
-    const deletelength = this.Store.selectedRowKeys.length;
-    console.log(deletelength);
     return (
       <Row>
         {this.renderButtons()}
@@ -81,20 +83,64 @@ class EditComponent extends React.Component<{ Store: Store, renderItem: (params:
   render() {
     return (
       <Drawer
-        title={this.Store.isUpdate ? 'Update' : 'Add'}
+        title={this.Store.pageState.isUpdate ? '修改' : '添加'}
         width={500}
         placement="right"
         closable={false}
-        onClose={() => this.Store.onVisible(false)}
-        visible={this.Store.visible.edit}
+        onClose={() => this.Store.onPageState("visibleEdit", false)}
+        visible={this.Store.pageState.visibleEdit}
+        className="app-table-edit-drawer"
         destroyOnClose={true}
       >
         <this.WrappedFormComponent {...this.props} renderItem={this.props.renderItem} />
+        <HideInstall Store={this.Store} />
       </Drawer>
     );
   }
 }
+@observer
+class HideInstall extends React.Component<{ Store: Store }, any> {
+  Store = this.props.Store;
+  state = {
+    visible: false
+  }
+  onVisible() {
+    this.setState(state => {
+      return { visible: !state.visible }
+    });
+  }
+  onChange(checkedValues) {
+    this.Store.appendInstall = checkedValues
+  }
+  render() {
+    return (
+      <>
+        <div className="app-hide-install" title="展示隐藏属性" onClick={this.onVisible.bind(this)}>
+          <Icon type="edit" theme="outlined" />
+        </div>
+        <Drawer
+          title="隐藏属性"
+          width={320}
+          onClose={this.onVisible.bind(this)}
+          closable={false}
+          visible={this.state.visible}
+          className="app-hide-install-drawer"
+        >
+          <Checkbox.Group defaultValue={this.Store.appendInstall.map(x => x.key)} onChange={this.onChange.bind(this)}>
+            <List
+              bordered
+              dataSource={this.Store.hideInstall}
+              renderItem={item => (<List.Item>
+                <Checkbox value={item.key} >{item.description}</Checkbox>
+              </List.Item>)}
+            />
+          </Checkbox.Group>
+        </Drawer>
+      </>
 
+    );
+  }
+}
 /**
  * 表单
  */
@@ -148,35 +194,60 @@ class FormComponent extends React.Component<Props, any> {
     }
     return date
   }
+  /**
+   * 表单 项
+   */
   renderItem() {
-    return this.props.renderItem({ form: this.props.form, initialValue: this.initialValue.bind(this) })
+    const { getFieldDecorator } = this.props.form;
+    const formItemLayout = {
+      labelCol: {
+        xs: { span: 24 },
+        sm: { span: 6 },
+      },
+      wrapperCol: {
+        xs: { span: 24 },
+        sm: { span: 16 },
+      },
+    };
+    let renderItem = this.props.renderItem({ form: this.props.form, initialValue: this.initialValue.bind(this) }) as any;
+    // 没有传递 表单项 由框架解析
+    if (typeof renderItem == "undefined") {
+      renderItem = this.Store.install.map(x => <FormItem label={x.description} {...formItemLayout} key={x.key}>
+        {getFieldDecorator(x.key, {
+          rules: x.rules,
+          initialValue: this.initialValue(x.key, x.format),
+        })(
+          <DataEntry {...this.props} {...x} common={x.attribute.common} />
+        )}
+      </FormItem>);
+    }
+    const appendInstall = this.Store.appendInstall.map(x => <FormItem label={x.description} {...formItemLayout} key={x.key}>
+      {getFieldDecorator(x.key, {
+        rules: x.rules,
+        initialValue: this.initialValue(x.key, x.format),
+      })(
+        <DataEntry {...this.props} {...x} common={x.attribute.common} />
+      )}
+    </FormItem>);
+    return <>
+      {renderItem}
+      {appendInstall}
+    </>
   }
   componentWillUnmount() {
-    this.Store.onEditLoading(false)
+    this.Store.onPageState("loadingEdit", false)
   }
   render() {
     return (
 
       <Form onSubmit={this.handleSubmit} className="app-table-edit-form">
-        <Spin spinning={this.Store.pageConfig.editLoading}>
+        <Spin spinning={this.Store.pageState.loadingEdit}>
           {this.renderItem()}
         </Spin>
-        <div
-          style={{
-            position: 'absolute',
-            bottom: 0,
-            width: '100%',
-            borderTop: '1px solid #e8e8e8',
-            padding: '10px 16px',
-            textAlign: 'right',
-            left: 0,
-            background: '#fff',
-            borderRadius: '0 0 4px 4px',
-          }}
-        >
-          <Button onClick={() => this.Store.onVisible(false)} >Cancel </Button>
+        <div className="app-table-edit-btns" >
+          <Button onClick={() => this.Store.onPageState("visibleEdit", false)} >取消 </Button>
           <Divider type="vertical" />
-          <Button loading={this.Store.pageConfig.editLoading} type="primary" htmlType="submit"  >Submit </Button>
+          <Button loading={this.Store.pageState.loadingEdit} type="primary" htmlType="submit"  >提交 </Button>
         </div>
       </Form>
     );
@@ -190,32 +261,15 @@ class PortComponent extends React.Component<{ Store: Store }, any> {
   Store = this.props.Store;
 
   render() {
-    // const props = {
-    //   name: 'file',
-    //   multiple: true,
-    //   action: '//jsonplaceholder.typicode.com/posts/',
-    //   onChange(info) {
-    //     const status = info.file.status;
-    //     if (status !== 'uploading') {
-    //       console.log(info.file, info.fileList);
-    //     }
-    //     if (status === 'done') {
-    //       message.success(`${info.file.name} file uploaded successfully.`);
-    //     } else if (status === 'error') {
-    //       message.error(`${info.file.name} file upload failed.`);
-    //     }
-    //   },
-    // };
-    const props = this.Store.onImport();
     return (
       <Modal
         title="Import&Export"
         centered
-        visible={this.Store.visible.port}
+        visible={this.Store.pageState.visiblePort}
         // destroyOnClose={true}
         closable={false}
-        onOk={() => { this.Store.onVisible(false, "port") }}
-        onCancel={() => { this.Store.onVisible(false, "port") }}
+        onOk={() => { this.Store.onPageState("visiblePort", false) }}
+        onCancel={() => { this.Store.onPageState("visiblePort", false) }}
         className="app-table-port-modal"
       >
         <Tabs defaultActiveKey="Import">
@@ -223,7 +277,7 @@ class PortComponent extends React.Component<{ Store: Store }, any> {
             <div className="app-table-port-tab-pane">
               <Button icon="download" block size="large" onClick={() => { this.Store.onTemplate() }}>模板</Button>
               <Divider />
-              <Dragger {...props}>
+              <Dragger {...this.Store.importConfig}>
                 <p className="ant-upload-drag-icon">
                   <Icon type="inbox" />
                 </p>
