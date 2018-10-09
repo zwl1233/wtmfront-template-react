@@ -68,7 +68,7 @@ export default class TableBodyComponent extends React.Component<{ Store: Store }
     }
     return {
       ...column,
-      sorter: true,
+      sorter:true,
       width: width,
       // 列拖拽
       onHeaderCell: col => ({
@@ -101,7 +101,7 @@ export default class TableBodyComponent extends React.Component<{ Store: Store }
     * 行选择
     */
   private rowSelection = {
-    selectedRowKeys: this.Store.selectedRowKeys,
+    // selectedRowKeys: this.Store.selectedRowKeys,
     onChange: e => this.Store.onSelectChange(e),
   };
   /**

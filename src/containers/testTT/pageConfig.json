@@ -1,7 +1,51 @@
 {
+    "name": "testTT",
     "idKey": "id",
     "address": "/school/",
     "columns": [
+        {
+            "type": "string",
+            "rules": [
+                {
+                    "required": true,
+                    "message": "Please input your undefined!"
+                }
+            ],
+            "attribute": {
+                "available": true,
+                "update": true
+            },
+            "key": "address"
+        },
+        {
+            "type": "string",
+            "rules": [
+                {
+                    "required": true,
+                    "message": "Please input your undefined!"
+                }
+            ],
+            "attribute": {
+                "available": true,
+                "update": true
+            },
+            "key": "createby"
+        },
+        {
+            "type": "string",
+            "format": "date-time",
+            "rules": [
+                {
+                    "required": true,
+                    "message": "Please input your undefined!"
+                }
+            ],
+            "attribute": {
+                "available": true,
+                "update": true
+            },
+            "key": "createdate"
+        },
         {
             "type": "integer",
             "format": "int64",
@@ -22,6 +66,146 @@
                 "update": true
             },
             "key": "id"
+        },
+        {
+            "type": "string",
+            "rules": [
+                {
+                    "required": true,
+                    "message": "Please input your undefined!"
+                }
+            ],
+            "attribute": {
+                "available": true,
+                "update": true
+            },
+            "key": "name"
+        },
+        {
+            "type": "string",
+            "rules": [
+                {
+                    "required": true,
+                    "message": "Please input your undefined!"
+                }
+            ],
+            "attribute": {
+                "available": true,
+                "update": true
+            },
+            "key": "remark"
+        },
+        {
+            "type": "string",
+            "rules": [
+                {
+                    "required": true,
+                    "message": "Please input your undefined!"
+                }
+            ],
+            "attribute": {
+                "available": true,
+                "update": true
+            },
+            "key": "updateby"
+        },
+        {
+            "type": "string",
+            "format": "date-time",
+            "rules": [
+                {
+                    "required": true,
+                    "message": "Please input your undefined!"
+                }
+            ],
+            "attribute": {
+                "available": true,
+                "update": true
+            },
+            "key": "updatedate"
+        }
+    ],
+    "search": [
+        {
+            "type": "string",
+            "format": "date-time",
+            "rules": [
+                {
+                    "required": true,
+                    "message": "Please input your undefined!"
+                }
+            ],
+            "attribute": {
+                "available": true,
+                "update": true
+            },
+            "key": "createdateFrom"
+        },
+        {
+            "type": "string",
+            "format": "date-time",
+            "rules": [
+                {
+                    "required": true,
+                    "message": "Please input your undefined!"
+                }
+            ],
+            "attribute": {
+                "available": true,
+                "update": true
+            },
+            "key": "createdateTo"
+        },
+        {
+            "type": "integer",
+            "format": "int64",
+            "description": "id",
+            "allowEmptyValue": false,
+            "minimum": 0,
+            "maximum": 20,
+            "exclusiveMinimum": false,
+            "exclusiveMaximum": false,
+            "rules": [
+                {
+                    "required": true,
+                    "message": "Please input your undefined!"
+                }
+            ],
+            "attribute": {
+                "available": true,
+                "update": true
+            },
+            "key": "id"
+        },
+        {
+            "type": "string",
+            "format": "date-time",
+            "rules": [
+                {
+                    "required": true,
+                    "message": "Please input your undefined!"
+                }
+            ],
+            "attribute": {
+                "available": true,
+                "update": true
+            },
+            "key": "updatedateFrom"
+        },
+        {
+            "type": "string",
+            "format": "date-time",
+            "rules": [
+                {
+                    "required": true,
+                    "message": "Please input your undefined!"
+                }
+            ],
+            "attribute": {
+                "available": true,
+                "update": true
+            },
+            "key": "updatedateTo"
         },
         {
             "type": "string",
@@ -173,34 +357,6 @@
                 "update": true
             },
             "key": "updateby"
-        }
-    ],
-    "search": [
-        {
-            "type": "string",
-            "description": "名称",
-            "allowEmptyValue": false,
-            "minLength": 0,
-            "maxLength": 50,
-            "rules": [
-                {
-                    "required": true,
-                    "message": "Please input your undefined!"
-                },
-                {
-                    "min": 0,
-                    "message": "min length 0!"
-                },
-                {
-                    "max": 50,
-                    "message": "max length 50!"
-                }
-            ],
-            "attribute": {
-                "available": true,
-                "update": true
-            },
-            "key": "name"
         }
     ],
     "install": [
@@ -556,7 +712,6 @@
         "update": true,
         "delete": true,
         "import": true,
-        "export": true,
-        "columns": true
+        "export": true
     }
 }

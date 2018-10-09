@@ -34,12 +34,11 @@
             ]
         },
         {
-            "Key": "30c4caba-4f03-4aed-9710-529fa674b90a",
-            "Name": "test",
+            "Key": "5525e108-5837-4080-970b-3f236b6b8841",
+            "Name": "testTT",
             "Icon": "menu-fold",
-            "Path": "/test",
-            "Component": "test",
-            "Action": [],
+            "Path": "/testTT",
+            "Component": "testTT",
             "Children": []
         }
     ]

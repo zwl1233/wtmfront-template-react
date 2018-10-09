@@ -7,7 +7,7 @@ export class Store extends storeBasice {
     constructor() {
         super({
             // api 地址前缀
-            address: '/corp/'
+            address: '/school/'
         });
     }
     /** swagger 解析数据结构 */ 
